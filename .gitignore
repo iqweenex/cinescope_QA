@@ -1,0 +1,47 @@
+# Создай файл .gitignore в корне с содержимым:
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Виртуальное окружение
+.venv/
+venv/
+ENV/
+env/
+
+# Секреты
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Тестовые артефакты
+.pytest_cache/
+.coverage
+htmlcov/
+allure-results/
+
+# Логи
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+test-results/
+playwright-report/
