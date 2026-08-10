@@ -1,5 +1,3 @@
-# Создай файл .gitignore в корне с содержимым:
-
 # Python
 __pycache__/
 *.pyc
@@ -45,3 +43,7 @@ Thumbs.db
 # Playwright
 test-results/
 playwright-report/
+
+# Временные файлы
+*.tmp
+*.temp
