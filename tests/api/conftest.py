@@ -6,6 +6,7 @@ from backend.api.services.auth.auth_service import AuthService
 from backend.api.services.auth.client.models.login_request import LoginRequest
 from backend.api.services.auth.client.models.register_request import RegisterRequest
 from config import Config
+from utils.soft_assert import SoftAssert
 
 faker = Faker()
 
@@ -103,3 +104,10 @@ def user_api_utils(registered_user) -> ApiUtils:
 @pytest.fixture(scope='session')
 def auth_service_user(user_api_utils) -> AuthService:
     return AuthService(api_utils=user_api_utils)
+
+
+@pytest.fixture(scope="function")
+def soft_assert():
+    soft = SoftAssert()
+    yield soft
+    soft.assert_all()
