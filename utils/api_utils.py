@@ -1,11 +1,10 @@
 import json
-
 import curlify
 import requests
 from requests import Session
-
 from logger.logger import Logger
 from utils.json_utils import JsonUtils
+from utils.exceptions import ApiError
 
 
 def log_response(func):
@@ -15,6 +14,15 @@ def log_response(func):
         body = json.dumps(response.json(), indent=2, ensure_ascii=False) if JsonUtils.is_json(
             response.text) else response.text
         Logger.info(f"Response status code='{response.status_code}', elapsed_time='{response.elapsed}'\n{body}\n")
+
+        # Если статус-код >= 400 — выбрасываем ApiError
+        if response.status_code >= 400:
+            error_data = response.json() if JsonUtils.is_json(response.text) else {"message": response.text}
+            error_messages = error_data.get("message", [error_data.get("error", response.text)])
+            if isinstance(error_messages, str):
+                error_messages = [error_messages]
+            raise ApiError(response.status_code, error_messages)
+
         return response
 
     return _log_response
@@ -24,7 +32,6 @@ class ApiUtils:
     def __init__(self, url, headers=None):
         if headers is None:
             headers = {}
-
         self.session = Session()
         self.session.headers.update(headers)
         self.url = url
