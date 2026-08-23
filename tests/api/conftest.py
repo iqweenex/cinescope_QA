@@ -111,3 +111,27 @@ def soft_assert():
     soft = SoftAssert()
     yield soft
     soft.assert_all()
+
+
+@pytest.fixture(scope='function')
+def auth_service_with_refresh(registered_user):
+    refresh_token = registered_user["refresh_token"]
+    api_utils = ApiUtils(
+        url=AuthService.SERVICE_URL,
+        cookies={"refresh_token": refresh_token}
+    )
+    return AuthService(api_utils)
+
+
+@pytest.fixture(scope='function')
+def auth_service_without_cookies():
+    api_utils = ApiUtils(url=AuthService.SERVICE_URL)
+    return AuthService(api_utils)
+
+@pytest.fixture(scope='function')
+def auth_service_with_invalid_refresh():
+    api_utils = ApiUtils(
+        url=AuthService.SERVICE_URL,
+        cookies={"refresh_token": "invalid-token"}
+    )
+    return AuthService(api_utils)
