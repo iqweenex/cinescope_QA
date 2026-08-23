@@ -1,3 +1,4 @@
+from backend.api.services.auth.client.models.login_request_raw import LoginRequestRaw
 from backend.api.services.auth.client.models.register_request_raw import RegisterRequestRaw
 from backend.api.services.general.base_service import BaseService
 from backend.api.services.auth.client.helpers.authorization_helper import AuthorizationHelper
@@ -34,6 +35,16 @@ class AuthService(BaseService):
         """
         response = self.authorization_helper.post_register(
             data=register_request.model_dump(by_alias=True)
+        )
+        return response.json()
+
+    def login_user_raw(self, login_request: LoginRequestRaw) -> dict:
+        """
+        Отправляет запрос на регистрацию без валидации данных.
+        Используется только в негативных тестах.
+        """
+        response = self.authorization_helper.post_register(
+            data=login_request.model_dump(by_alias=True)
         )
         return response.json()
 

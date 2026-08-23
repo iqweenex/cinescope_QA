@@ -10,28 +10,7 @@ from utils.constants import HTTPStatus
 
 @allure.epic("Auth API")
 @allure.feature("Регистрация")
-class TestRegister:
-    DUPLICATE_MAIL_ERROR_MESSAGE = "Пользователь с таким email уже зарегистрирован"
-    INVALID_MAIL_ERROR_MESSAGE = "Некорректный email"
-    MISSMATCH_PASSWORDS_ERROR_MESSAGE = "Пароли не совпадают"
-    EMPTY_FIELDS_ERROR_MESSAGE = "не должно быть пустым"
-    PASSWORD_TOO_SHORT_MESSAGE = "Минимальная длина пароля 8 символов"
-    PASSWORD_NO_UPPERCASE_MESSAGE = "Пароль должен содержать хотя бы одну заглавную букву"
-    PASSWORD_NO_DIGITS_ERROR_MESSAGE = "Пароль должен содержать хотя бы одну цифру"
-
-    DUPLICATE_MAIL_STATUS_CODE = HTTPStatus.CONFLICT
-    INVALID_MAIL_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    MISSMATCH_PASSWORDS_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    EMPTY_FIELD_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    PASSWORD_TOO_SHORT_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    PASSWORD_NO_UPPERCASE_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    PASSWORD_NO_DIGITS_STATUS_CODE = HTTPStatus.BAD_REQUEST
-
-    TEST_PASSWORD_TOO_SHORT = "Abcd1"
-    TEST_PASSWORD_NO_UPPERCASE = "abcd123456"
-    TEST_PASSWORD_NO_DIGITS = "Abcdesgdgsdg"
-    TEST_INVALID_MAIL = "testmail"
-
+class TestRegisterPositive:
     @allure.story("Позитивные сценарии")
     @allure.title("Успешная регистрация нового пользователя")
     @allure.severity(allure.severity_level.CRITICAL)
@@ -62,6 +41,31 @@ class TestRegister:
         soft_assert.assert_true(response.verified, "verified должен быть True")
         soft_assert.assert_true(not response.banned, "banned должен быть False")
         soft_assert.assert_true("password" not in response.model_dump(), "пароль не должен возвращаться в ответе")
+
+
+@allure.epic("Auth API")
+@allure.feature("Регистрация")
+class TestRegisterNegative:
+    DUPLICATE_MAIL_ERROR_MESSAGE = "Пользователь с таким email уже зарегистрирован"
+    INVALID_MAIL_ERROR_MESSAGE = "Некорректный email"
+    MISSMATCH_PASSWORDS_ERROR_MESSAGE = "Пароли не совпадают"
+    EMPTY_FIELDS_ERROR_MESSAGE = "не должно быть пустым"
+    PASSWORD_TOO_SHORT_MESSAGE = "Минимальная длина пароля 8 символов"
+    PASSWORD_NO_UPPERCASE_MESSAGE = "Пароль должен содержать хотя бы одну заглавную букву"
+    PASSWORD_NO_DIGITS_ERROR_MESSAGE = "Пароль должен содержать хотя бы одну цифру"
+
+    DUPLICATE_MAIL_STATUS_CODE = HTTPStatus.CONFLICT
+    INVALID_MAIL_STATUS_CODE = HTTPStatus.BAD_REQUEST
+    MISSMATCH_PASSWORDS_STATUS_CODE = HTTPStatus.BAD_REQUEST
+    EMPTY_FIELD_STATUS_CODE = HTTPStatus.BAD_REQUEST
+    PASSWORD_TOO_SHORT_STATUS_CODE = HTTPStatus.BAD_REQUEST
+    PASSWORD_NO_UPPERCASE_STATUS_CODE = HTTPStatus.BAD_REQUEST
+    PASSWORD_NO_DIGITS_STATUS_CODE = HTTPStatus.BAD_REQUEST
+
+    TEST_PASSWORD_TOO_SHORT = "Abcd1"
+    TEST_PASSWORD_NO_UPPERCASE = "abcd123456"
+    TEST_PASSWORD_NO_DIGITS = "Abcdesgdgsdg"
+    TEST_INVALID_MAIL = "testmail"
 
     @allure.story("Негативные сценарии")
     @allure.title("Регистрация с дублирующимся email")
@@ -150,7 +154,7 @@ class TestRegister:
     @allure.title("Регистрация с пустыми полями")
     @allure.severity(allure.severity_level.NORMAL)
     @pytest.mark.regression
-    def test_register_invalid_email(self, auth_service_anonym, test_user_credentials):
+    def test_register_empty_fields(self, auth_service_anonym, test_user_credentials):
         password = test_user_credentials["password"]
         full_name = test_user_credentials["full_name"]
 
