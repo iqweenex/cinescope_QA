@@ -1,4 +1,5 @@
 import pytest
+from uuid import uuid4
 from faker import Faker
 from logger.logger import Logger
 from utils.api_utils import ApiUtils
@@ -39,9 +40,10 @@ def test_user_credentials():
 @pytest.fixture
 def user_data_factory():
     def _factory(**overrides):
+        unique_id = uuid4().hex
         return {
-            "login": faker.user_name(),
-            "email": faker.email(),
+            "login": unique_id,
+            "email": f"{unique_id}@example.com",
             "password": faker.password(
                 length=12,
                 special_chars=True,
