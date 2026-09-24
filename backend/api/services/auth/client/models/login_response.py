@@ -10,8 +10,12 @@ class UserInfo(BaseModel):
     )
 
     id: str
+    login: str
     email: EmailStr
     full_name: str
+    created_at: str
+    verified: bool
+    banned: bool
     roles: list[str]
 
 
@@ -24,5 +28,4 @@ class LoginResponse(BaseModel):
 
     user: UserInfo
     access_token: str
-    refresh_token: str
     expires_in: int

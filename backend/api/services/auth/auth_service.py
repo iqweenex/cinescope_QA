@@ -1,5 +1,3 @@
-from backend.api.services.auth.client.models.login_request_raw import LoginRequestRaw
-from backend.api.services.auth.client.models.register_request_raw import RegisterRequestRaw
 from backend.api.services.general.base_service import BaseService
 from backend.api.services.auth.client.helpers.authorization_helper import AuthorizationHelper
 from backend.api.services.auth.user_admin.helpers.user_helper import UserHelper
@@ -28,24 +26,20 @@ class AuthService(BaseService):
         response = self.authorization_helper.post_register(data=register_request.model_dump(by_alias=True))
         return RegisterResponse(**response.json())
 
-    def register_user_raw(self, register_request: RegisterRequestRaw) -> dict:
+    def register_user_raw(self, data: dict) -> dict:
         """
         Отправляет запрос на регистрацию без валидации данных.
         Используется только в негативных тестах.
         """
-        response = self.authorization_helper.post_register(
-            data=register_request.model_dump(by_alias=True)
-        )
+        response = self.authorization_helper.post_register(data=data)
         return response.json()
 
-    def login_user_raw(self, login_request: LoginRequestRaw) -> dict:
+    def login_user_raw(self, data: dict) -> dict:
         """
         Отправляет запрос на регистрацию без валидации данных.
         Используется только в негативных тестах.
         """
-        response = self.authorization_helper.post_register(
-            data=login_request.model_dump(by_alias=True)
-        )
+        response = self.authorization_helper.post_login(data=data)
         return response.json()
 
     def login_user(self, login_request: LoginRequest) -> LoginResponse:
