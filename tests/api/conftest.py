@@ -22,30 +22,9 @@ def auth_service_anonym(auth_api_utils_anonym) -> AuthService:
 
 
 @pytest.fixture(scope='session')
-def admin_api_utils(auth_service_anonym) -> ApiUtils:
-    Logger.info(f"Логин администратора: {Config.ADMIN_EMAIL}")
-
-    login_response = auth_service_anonym.login_user(
-        LoginRequest(
-            email=Config.ADMIN_EMAIL,
-            password=Config.ADMIN_PASSWORD
-        )
-    )
-
-    return ApiUtils(
-        url=AuthService.SERVICE_URL,
-        headers={"Authorization": f"Bearer {login_response.access_token}"}
-    )
-
-
-@pytest.fixture(scope='session')
-def auth_service_admin(admin_api_utils) -> AuthService:
-    return AuthService(api_utils=admin_api_utils)
-
-
-@pytest.fixture(scope='session')
 def test_user_credentials():
     return {
+        "login": faker.user_name(),
         "email": faker.email(),
         "password": faker.password(
             length=12,
@@ -53,51 +32,95 @@ def test_user_credentials():
             digits=True,
             upper_case=True,
             lower_case=True
-        ),
-        "full_name": faker.name()
+        )
     }
+
+
+@pytest.fixture
+def user_data_factory():
+    def _factory(**overrides):
+        return {
+            "login": faker.user_name(),
+            "email": faker.email(),
+            "password": faker.password(
+                length=12,
+                special_chars=True,
+                digits=True,
+                upper_case=True,
+                lower_case=True
+            ),
+            **overrides
+        }
+
+    return _factory
 
 
 @pytest.fixture(scope='session')
 def registered_user(auth_service_anonym, test_user_credentials) -> dict:
+    login = test_user_credentials["login"]
     email = test_user_credentials["email"]
     password = test_user_credentials["password"]
-    full_name = test_user_credentials["full_name"]
 
-    Logger.info(f"Регистрация тестового пользователя: {email}")
+    Logger.info(f"Регистрация тестового пользователя: login={login}, email={email}")
 
-    # Регистрация
-    auth_service_anonym.register_user(
+    response = auth_service_anonym.register_user(
         RegisterRequest(
+            login=login,
             email=email,
-            full_name=full_name,
-            password=password,
-            password_repeat=password
+            password=password
         )
     )
 
-    # Логин для получения токенов
-    login_response = auth_service_anonym.login_user(
-        LoginRequest(email=email, password=password)
-    )
-
-    Logger.info(f"Тестовый пользователь зарегистрирован и авторизован: {email}")
+    Logger.info(f"Тестовый пользователь зарегистрирован {email}")
 
     return {
+        "login": login,
         "email": email,
         "password": password,
-        "full_name": full_name,
-        "access_token": login_response.access_token,
-        "refresh_token": login_response.refresh_token,
-        "user_id": login_response.user.id
+        "user_id": response.id
     }
 
 
 @pytest.fixture(scope='session')
-def user_api_utils(registered_user) -> ApiUtils:
+def logged_in_user(auth_service_anonym, registered_user) -> dict:
+    login = registered_user["login"]
+    password = registered_user["password"]
+
+    Logger.info(f"Авторизация тестового пользователя: login={login}")
+
+    login_response = auth_service_anonym.login_user(
+        LoginRequest(
+            login=login,
+            password=password
+        )
+    )
+
+    refresh_token = auth_service_anonym.api_utils.session.cookies.get("refresh_token")
+
+    return {
+        **registered_user,
+        "access_token": login_response.access_token,
+        "refresh_token": refresh_token
+    }
+
+
+@pytest.fixture(scope='function')
+def auth_service_factory():
+    def _factory(refresh_token=None):
+        cookies = {"refresh_token": refresh_token} if refresh_token else None
+        return AuthService(ApiUtils(
+            url=AuthService.SERVICE_URL,
+            cookies=cookies
+        ))
+
+    return _factory
+
+
+@pytest.fixture(scope='session')
+def user_api_utils(logged_in_user) -> ApiUtils:
     return ApiUtils(
         url=AuthService.SERVICE_URL,
-        headers={"Authorization": f"Bearer {registered_user['access_token']}"}
+        headers={"Authorization": f"Bearer {logged_in_user['access_token']}"}
     )
 
 

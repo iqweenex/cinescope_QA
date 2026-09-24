@@ -10,7 +10,8 @@ class RegisterResponse(BaseModel):
     )
 
     id: str
-    email: EmailStr
+    login: str
+    email: EmailStr | None = None
     full_name: str
     roles: list[str]
     verified: bool

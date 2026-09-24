@@ -9,7 +9,6 @@ class RegisterRequest(BaseModel):
         populate_by_name=True
     )
 
-    email: EmailStr
-    full_name: str
+    email: EmailStr | None = None
+    login: str
     password: str
-    password_repeat: str

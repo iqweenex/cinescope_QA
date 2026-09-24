@@ -9,5 +9,6 @@ class BaseUser(BaseModel):
         populate_by_name=True
     )
 
-    email: EmailStr
+    login: str
+    email: EmailStr | None = None
     full_name: str

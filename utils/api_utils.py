@@ -29,11 +29,13 @@ def log_response(func):
 
 
 class ApiUtils:
-    def __init__(self, url, headers=None):
+    def __init__(self, url, headers=None, cookies=None):
         if headers is None:
             headers = {}
         self.session = Session()
         self.session.headers.update(headers)
+        if cookies:
+            self.session.cookies.update(cookies)
         self.url = url
 
     @log_response
