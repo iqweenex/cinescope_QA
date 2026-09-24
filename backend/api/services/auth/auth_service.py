@@ -36,7 +36,7 @@ class AuthService(BaseService):
 
     def login_user_raw(self, data: dict) -> dict:
         """
-        Отправляет запрос на регистрацию без валидации данных.
+        Отправляет запрос на авторизацию без валидации данных.
         Используется только в негативных тестах.
         """
         response = self.authorization_helper.post_login(data=data)

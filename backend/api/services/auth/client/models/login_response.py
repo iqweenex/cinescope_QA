@@ -11,7 +11,7 @@ class UserInfo(BaseModel):
 
     id: str
     login: str
-    email: EmailStr
+    email: EmailStr | None = None
     full_name: str
     created_at: str
     verified: bool
