@@ -1,13 +1,9 @@
 import pytest
 import allure
-import requests
 from backend.api.services.auth.client.models.register_request import RegisterRequest
 from logger.logger import Logger
 from utils.exceptions import ApiError
 from utils.constants import HTTPStatus
-from faker import Faker
-
-faker = Faker()
 
 
 @allure.epic("Auth API")
@@ -49,8 +45,7 @@ class TestRegisterPositive:
 class TestRegisterNegative:
     DUPLICATE_MAIL_ERROR_MESSAGE = "Пользователь с таким email уже зарегистрирован"
     DUPLICATE_LOGIN_ERROR_MESSAGE = "Пользователь с таким login уже зарегистрирован"
-    INVALID_MAIL_ERROR_MESSAGE = "Некорректный email"
-    MISSMATCH_PASSWORDS_ERROR_MESSAGE = "Пароли не совпадают"
+    INVALID_MAIL_ERROR_MESSAGE = "Некорректный email"
     EMPTY_FIELDS_ERROR_MESSAGE = "не должно быть пустым"
     PASSWORD_TOO_SHORT_MESSAGE = "Минимальная длина пароля 8 символов"
     PASSWORD_NO_UPPERCASE_MESSAGE = "Пароль должен содержать хотя бы одну заглавную букву"
@@ -58,7 +53,6 @@ class TestRegisterNegative:
 
     DUPLICATE_MAIL_OR_LOGIN_STATUS_CODE = HTTPStatus.CONFLICT
     INVALID_MAIL_STATUS_CODE = HTTPStatus.BAD_REQUEST
-    MISSMATCH_PASSWORDS_STATUS_CODE = HTTPStatus.BAD_REQUEST
     EMPTY_FIELD_STATUS_CODE = HTTPStatus.BAD_REQUEST
     PASSWORD_TOO_SHORT_STATUS_CODE = HTTPStatus.BAD_REQUEST
     PASSWORD_NO_UPPERCASE_STATUS_CODE = HTTPStatus.BAD_REQUEST
@@ -140,42 +134,15 @@ class TestRegisterNegative:
                 }
             )
 
-            assert exc_info.value.status_code == self.INVALID_MAIL_STATUS_CODE, (
-                f"Expected status code: {self.INVALID_MAIL_STATUS_CODE}\n"
-                f"Actual status code: {exc_info.value.status_code}"
-            )
+        assert exc_info.value.status_code == self.INVALID_MAIL_STATUS_CODE, (
+            f"Expected status code: {self.INVALID_MAIL_STATUS_CODE}\n"
+            f"Actual status code: {exc_info.value.status_code}"
+        )
 
-            assert any(self.INVALID_MAIL_ERROR_MESSAGE in msg for msg in exc_info.value.messages), (
-                f"Expected error message: {self.INVALID_MAIL_ERROR_MESSAGE}\n"
-                f"Actual messages: {exc_info.value.messages}"
-            )
-
-    # НЕТ ПОЛЯ 'ПОВТОРИТЕ ПАРОЛЬ'!!!
-    # @allure.story("Негативные сценарии")
-    # @allure.title("Регистрация с несовпадающими паролями")
-    # @allure.severity(allure.severity_level.NORMAL)
-    # @pytest.mark.regression
-    # def test_register_password_mismatch(self, auth_service_anonym, test_user_credentials):
-    #     email = test_user_credentials["email"]
-    #     password = test_user_credentials["password"]
-    #     full_name = test_user_credentials["full_name"]
-    #     with pytest.raises(ApiError) as exc_info:
-    #         auth_service_anonym.register_user(
-    #             RegisterRequest(
-    #                 email=email,
-    #                 full_name=full_name,
-    #                 password=password,
-    #                 password_repeat=password + "1"
-    #             )
-    #         )
-    #     assert exc_info.value.status_code == self.MISSMATCH_PASSWORDS_STATUS_CODE, (
-    #         f"Expected status code: {self.MISSMATCH_PASSWORDS_STATUS_CODE}\n"
-    #         f"Actual status code: {exc_info.value.response.status_code}"
-    #     )
-    #     assert self.MISSMATCH_PASSWORDS_ERROR_MESSAGE in exc_info.value.messages, (
-    #         f"Expected error message: {self.MISSMATCH_PASSWORDS_ERROR_MESSAGE}\n"
-    #         f"Actual message: {exc_info.value.messages}"
-    #     )
+        assert any(self.INVALID_MAIL_ERROR_MESSAGE in msg for msg in exc_info.value.messages), (
+            f"Expected error message: {self.INVALID_MAIL_ERROR_MESSAGE}\n"
+            f"Actual messages: {exc_info.value.messages}"
+        )
 
     @allure.story("Негативные сценарии")
     @allure.title("Регистрация с пустыми полями")
