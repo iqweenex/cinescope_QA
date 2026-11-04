@@ -1,5 +1,5 @@
 import json
-import curlify
+from curlify3 import to_curl, SENSITIVE_HEADERS
 import requests
 from requests import Session
 from logger.logger import Logger
@@ -10,7 +10,7 @@ from utils.exceptions import ApiError
 def log_response(func):
     def _log_response(*args, **kwargs) -> requests.Response:
         response = func(*args, **kwargs)
-        Logger.info(f"Request: {curlify.to_curl(response.request)}")
+        Logger.info(f"Request: {to_curl(response.request, mask_headers=SENSITIVE_HEADERS)}")
         body = json.dumps(response.json(), indent=2, ensure_ascii=False) if JsonUtils.is_json(
             response.text) else response.text
         Logger.info(f"Response status code='{response.status_code}', elapsed_time='{response.elapsed}'\n{body}\n")
