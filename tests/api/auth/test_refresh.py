@@ -21,7 +21,7 @@ class TestRefreshPositive:
         soft_assert.assert_true(isinstance(access_token, str) and len(access_token) > 0,
                                 f"accessToken должен быть непустой строкой, получено: {access_token!r}")
         soft_assert.assert_true(isinstance(expires_in, int) and expires_in > 0,
-                                f"accessToken должен быть непустой строкой, получено: {expires_in!r}")
+                                f"expiresIn должен быть непустой строкой, получено: {expires_in!r}")
 
 
 @allure.epic("Auth API")

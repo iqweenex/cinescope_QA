@@ -6,16 +6,39 @@ from logger.logger import Logger
 from utils.json_utils import JsonUtils
 from utils.exceptions import ApiError
 
+SENSITIVE_BODY_KEYS = {
+    "accessToken", "access_token",
+    "refreshToken", "refresh_token",
+    "token", "password", "expiresIn",
+}
+
+
+def _mask_sensitive_data(data):
+    if isinstance(data, dict):
+        return {
+            key: ("***" if key in SENSITIVE_BODY_KEYS else _mask_sensitive_data(value))
+            for key, value in data.items()
+        }
+    if isinstance(data, list):
+        return [_mask_sensitive_data(item) for item in data]
+    return data
+
 
 def log_response(func):
     def _log_response(*args, **kwargs) -> requests.Response:
         response = func(*args, **kwargs)
         Logger.info(f"Request: {to_curl(response.request, mask_headers=SENSITIVE_HEADERS)}")
-        body = json.dumps(response.json(), indent=2, ensure_ascii=False) if JsonUtils.is_json(
-            response.text) else response.text
+
+        if JsonUtils.is_json(response.text):
+            raw_json = response.json()
+            masked_json = _mask_sensitive_data(raw_json)
+            body = json.dumps(masked_json, indent=2, ensure_ascii=False)
+        else:
+            body = response.text
+
+
         Logger.info(f"Response status code='{response.status_code}', elapsed_time='{response.elapsed}'\n{body}\n")
 
-        # Если статус-код >= 400 — выбрасываем ApiError
         if response.status_code >= 400:
             error_data = response.json() if JsonUtils.is_json(response.text) else {"message": response.text}
             error_messages = error_data.get("message", [error_data.get("error", response.text)])
